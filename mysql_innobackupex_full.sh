@@ -28,6 +28,7 @@ MYSQL_VERSION=$($MYSQL_BASEDIR/bin/mysql -V |
 [[ -z "$FULL_BACKUP_DIR" ]] &&
     FULL_BACKUP_DIR=$BACKUP_DIR/week$(date +%V)/full_$(date +%Y%m%d)
 
+# shellcheck disable=SC2188
 [[ -s "$BACKUP_TMP_LOG" ]] && >"$BACKUP_TMP_LOG"
 
 log(){
@@ -38,6 +39,7 @@ log(){
 pipelog(){
     while read -r line;do
         time=$(date +%F" "%T)
+        # shellcheck disable=SC2001
         echo "$line"|sed "s/^/$time [$1]: /" >>$BACKUP_TMP_LOG 2>&1
     done
 }

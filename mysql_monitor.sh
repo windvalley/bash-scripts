@@ -24,6 +24,7 @@ alarm(){
 }
 
 # mysqld process check
+# shellcheck disable=SC2009
 mysqld_process_num=$(ps axu|grep -v grep |grep -c mysqld)
 [[ "$mysqld_process_num" -lt 2 ]] && {
         subject="MysqldError"

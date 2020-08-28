@@ -5,7 +5,8 @@
 #   8 0 * * *  /bin/bash /yourpath/innodb_mysqldump.sh db1 db2 ...
 
 
-WORK_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+# shellcheck disable=SC2046
+WORK_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 TIME_FORMAT=$(date +%Y%m%d_%H)
 BACKUP_DIR=$WORK_DIR/data/$TIME_FORMAT
 LOG_FILE=$BACKUP_DIR/mysqldump.log
@@ -30,7 +31,8 @@ log(){
 pipelog(){
     local subject=$1
     while read -r line;do
-        echo $line|sed "s/^/$(date +%F" "%T) [$subject]: /" >>$LOG_FILE 2>&1
+        # shellcheck disable=SC2001
+        echo "$line"|sed "s/^/$(date +%F" "%T) [$subject]: /" >>"$LOG_FILE" 2>&1
     done
 }
 
@@ -79,8 +81,9 @@ backup(){
             exit 1
         fi
 
-        file_size=$(ls -l ${dump_file}.tgz | awk '{print $5}')
-        file_md5=$(md5sum ${dump_file}.tgz | awk '{print $1}')
+        # shellcheck disable=SC2012
+        file_size=$(ls -l "${dump_file}".tgz | awk '{print $5}')
+        file_md5=$(md5sum "${dump_file}".tgz | awk '{print $1}')
 
         echo "$file_md5 $file_size" > "${dump_file}".tgz.md5
 

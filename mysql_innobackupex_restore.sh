@@ -26,7 +26,8 @@ XTRA_BIN_DIR=/usr/local/src/percona-xtrabackup-2.3.2-Linux-x86_64/bin
 XTRA_BIN_DIR_FOR51=/usr/local/src/percona-xtrabackup-2.0.8/bin
 USE_MEMORY=1G
 ARGS="$*"
-WORK_DIR=$(cd $(dirname $0) && pwd)
+# shellcheck disable=SC2046
+WORK_DIR=$(cd $(dirname "$0") && pwd)
 RESTORE_LOG=$WORK_DIR/restore.log
 
 MYSQL_BASEDIR=/usr/local/mysql5627
@@ -45,6 +46,7 @@ log(){
 pipelog(){
     while read -r line;do
         time=$(date +%F" "%T)
+        # shellcheck disable=SC2001
         echo "$line"|sed "s/^/$time [$1]: /" >>"$RESTORE_LOG" 2>&1
     done
 }
