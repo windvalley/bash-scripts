@@ -21,23 +21,39 @@ unset UPTIME
 eval "$($MYSQL_CONN -e "show global status" | awk '{print $1"=\x27"$2"\047"}')"
 [[ X = X"$UPTIME" ]] || exit 1
 
+# shellcheck disable=SC2154
 qps=$(compute "$Questions/$UPTIME")
+# shellcheck disable=SC2154
 tps=$(compute "($Com_commit+$Com_rollback)/$UPTIME")
+# shellcheck disable=SC2154
 reads=$(compute "$Com_select+$Qcache_hits")
+# shellcheck disable=SC2154
 writes=$(compute "$Com_insert+$Com_update+$Com_delete+$Com_replace")
+# shellcheck disable=SC2154
 rwratio=$(compute "$reads/$writes*100")%
+# shellcheck disable=SC2154
 key_buffer_read_hits=$(compute "(1-$Key_reads/$Key_read_requests)*100")%
+# shellcheck disable=SC2154
 key_buffer_write_hits=$(compute "(1-$Key_writes/$Key_write_requests)*100")%
+# shellcheck disable=SC2154
 query_cache_hits=$(compute "$Qcache_hits/($Qcache_hits+$Qcache_inserts)*100")%
+# shellcheck disable=SC2154
 innodb_buffer_read_hits=$(compute "(1-$Innodb_buffer_pool_reads/$Innodb_buffer_pool_read_requests)*100")%
+# shellcheck disable=SC2154
 thread_cache_hits=$(compute "(1-$Threads_created/$Connections)*100")%
+# shellcheck disable=SC2154
 slow_queries_per_second=$(compute "$Slow_queries/$UPTIME*60")
+# shellcheck disable=SC2154
 select_full_join_per_second=$(compute "$Select_full_join/$UPTIME*60")
+# shellcheck disable=SC2154
 select_full_join_in_all_select=$(compute "($Select_full_join/$Com_select)*100")%
+# shellcheck disable=SC2154
 myisam_lock_contention=$(compute "($Table_locks_waited/$Table_locks_immediate)*100")%
+# shellcheck disable=SC2154
 temp_tables_to_disk_ratio=$(compute "($Created_tmp_disk_tables/$Created_tmp_tables)*100")%
 
 # print formated MySQL status report
+# shellcheck disable=SC2154
 title="******************** MySQL $host General Status ***********************"
 width=${#title}
 

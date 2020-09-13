@@ -51,7 +51,7 @@ install_vim(){
 
 install_python3(){
     sudo yum install -y python3
-    sudo \cp pip.conf /etc/
+    sudo cp pip.conf /etc/
     sudo pip3 install ipython
 }
 

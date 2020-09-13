@@ -75,9 +75,8 @@ echo $MYSQL_SRC_TGZ|grep -q '\.tar\.gz$' || {
     exit 1
 }
 
-trap "log 'ALERT' 'ctrl+c.Aborted!'
-    rm -rf $BASE_DIR $MYSQL_SRC_DIR
-    exit 2" 2
+# shellcheck disable=SC2064
+trap "log 'ALERT' 'ctrl+c.Aborted!'; rm -rf '${BASE_DIR}' '${MYSQL_SRC_DIR}' 1exit 2" 2
 
 log "NOTE" "begin install mysql$VERSION_NUM on $BASE_DIR."
 
@@ -113,6 +112,7 @@ if [[ "$SECOND_VERSION_NUM" -eq 1 ]]; then
     log "NOTE" "begin configure."
     (
     exec 2>&1
+    # shellcheck disable=SC2015
     ./configure  --prefix="$BASE_DIR" --with-unix-socket-path="$TMP_DIR"/mysql.sock \
         --with-plugins=partition,csv,archive,federated,innobase,innodb_plugin,myisam,heap \
         --with-charset=utf8\
@@ -131,6 +131,7 @@ else
     log "NOTE" "begin cmake."
     (
     exec 2>&1
+    # shellcheck disable=SC2015
     cmake . \
         -DCMAKE_INSTALL_PREFIX="$BASE_DIR"  \
         -DINSTALL_MYSQLDATADIR="$DATA_DIR"  \
@@ -150,13 +151,15 @@ fi
 log "NOTE" "begin make."
 (
 exec 2>&1
-make -j $(grep -c processor /proc/cpuinfo) &&
+# shellcheck disable=SC2015
+make -j "$(grep -c processor /proc/cpuinfo)" &&
     log "NOTE" "make success." || { log "ERROR" "make error.Aborted!";$EXIT;}
 ) | pipelog "make"
 
 log "NOTE" "begin make install."
 (
 exec 2>&1
+# shellcheck disable=SC2015
 make install &&
     log "NOTE" "make install success." || {
         log "ERROR" "make install error.Aborted!";$EXIT;}
@@ -228,7 +231,7 @@ net_buffer_length        = 16K
 max_allowed_packet       = 64M
 
 ##********** cache **********##
-$( [ $SECOND_VERSION_NUM -eq 1 -a $THIRD_VERSION_NUM -lt 3 ] && echo "
+$( [[ "$SECOND_VERSION_NUM" -eq 1 ]] && [[ "$THIRD_VERSION_NUM" -lt 3 ]] && echo "
 # (<5.1.3) default:64;
 # the number of open tables for all threads;
 table_cache    		 = 64
@@ -597,22 +600,27 @@ exec 2>&1
 
 log "NOTE" "$MYSQL_INSTALL_DB --user=mysql --defaults-file=$ETC_DIR/my.cnf --basedir=$BASE_DIR"
 
+# shellcheck disable=SC2015
 "$MYSQL_INSTALL_DB" --user=mysql --defaults-file="$ETC_DIR"/my.cnf --basedir="$BASE_DIR" &&
     log "NOTE" "mysql_install_db success." || {
         log "ERROR" "mysql_install_db error.Aborted!";$EXIT;}
 ) | pipelog "make install db"
 
+# shellcheck disable=SC2015
 [[ -f /etc/my.cnf ]] &&
     { rm -f /etc/my.cnf;log "NOTE" "/etc/my.cnf removed."; } ||
         log "NOTE" "/etc/my.cnf not exists."
+# shellcheck disable=SC2015
 [[ -f /etc/mysql/my.cnf ]] && {
     rm -f /etc/mysql/my.cnf;log "NOTE" "/etc/mysql/my.cnf removed."; } ||
         log "NOTE" "/etc/mysql/my.cnf not exists."
+# shellcheck disable=SC2015,SC2088
 [[ -f ~/.my.cnf ]] && {
     rm -f ~/.my.cnf;log "NOTE" "~/.my.cnf removed."; } ||
         log "NOTE" "~/.my.cnf not exists."
+# shellcheck disable=SC2015,SC2088
 [[ -f $BASE_DIR/my.cnf ]] && {
-    rm -f $BASE_DIR/my.cnf;log "NOTE" "$BASE_DIR/my.cnf removed."; } ||
+    rm -f "$BASE_DIR"/my.cnf;log "NOTE" "$BASE_DIR/my.cnf removed."; } ||
         log "NOTE" "$BASE_DIR/my.cnf not exists."
 
 (
@@ -621,10 +629,12 @@ exec 2>&1
     MYSQL_SERVER="$BASE_DIR/share/mysql/mysql.server" ||
         MYSQL_SERVER="$BASE_DIR/support-files/mysql.server"
 cp "$MYSQL_SERVER" "$BASE_DIR"/bin/ && log "NOTE" "mysql.server at $BASE_DIR/bin/mysql.server."
+# shellcheck disable=SC2015
 "$BASE_DIR"/bin/mysql.server start && log "NOTE" "mysqld start success." || {
     log "ERROR" "mysqld start failed.Aborted!";$EXIT;}
 ) | pipelog "mysql.server"
 
+# shellcheck disable=SC2015
 "$BASE_DIR"/bin/mysqladmin password "$ROOT_PASSWORD" 2>/dev/null &&
     log "NOTE" "set root password success." || {
         log "ERROR" "set root password failed.Aborted!";exit 1;}

@@ -8,9 +8,13 @@ MYSQL_SRCTGZ=$SRC_DIR/mysql-5.6.28.tar.gz
 NGINX_SRCTGZ=$SRC_DIR/nginx-1.9.9.tar.gz
 PHP_SRCTGZ=$SRC_DIR/php-5.6.16.tar.gz
 ZABBIX_SRCTGZ=$SRC_DIR/zabbix-2.4.7.tar.gz
+# shellcheck disable=SC2001
 MYSQL_SRC_DIR=$(echo ${MYSQL_SRCTGZ##*/}|sed 's/.tar.gz//')
+# shellcheck disable=SC2001
 NGINX_SRC_DIR=$(echo ${NGINX_SRCTGZ##*/}|sed 's/.tar.gz//')
+# shellcheck disable=SC2001
 PHP_SRC_DIR=$(echo ${PHP_SRCTGZ##*/}|sed 's/.tar.gz//')
+# shellcheck disable=SC2001
 ZABBIX_SRC_DIR=$(echo ${ZABBIX_SRCTGZ##*/}|sed 's/.tar.gz//')
 
 ZABBIX_BASEDIR=/home/zabbix
@@ -252,7 +256,7 @@ cd "$ZABBIX_SRC_DIR" || exit 1
         --with-mysql=$MYSQL_DIR/bin/mysql_config \
         --with-net-snmp \
         --with-libcurl
-make -j "$(grep -c processor /proc/cpuinfo))
+make -j "$(grep -c processor /proc/cpuinfo)"
 make install
 
 \cp -r frontends/php $NGINX_DIR/html/zabbix
@@ -266,15 +270,15 @@ $MYSQL_DIR/bin/mysql -uroot -p$MYSQL_ROOT_PASSWORD zabbix <database/mysql/data.s
 \cp misc/init.d/tru64/zabbix_server $ZABBIX_DIR/bin/zabbix_server_ctrl
 \cp misc/init.d/tru64/zabbix_agentd $ZABBIX_DIR/bin/zabbix_agentd_ctrl
 
-sed -i "s#DAEMON=/usr/local/sbin/zabbix_server#$ZABBIX_DIR/sbin/zabbix_server#" \
+sed -i "s!DAEMON=/usr/local/sbin/zabbix_server!$ZABBIX_DIR/sbin/zabbix_server!" \
     $ZABBIX_DIR/bin/zabbix_server_ctrl
-sed -i "s#DAEMON=/usr/local/sbin/zabbix_agentd#$ZABBIX_DIR/sbin/zabbix_agentd#" \
+sed -i "s!DAEMON=/usr/local/sbin/zabbix_agentd!$ZABBIX_DIR/sbin/zabbix_agentd!" \
     $ZABBIX_DIR/bin/zabbix_agentd_ctrl
 chmod +x $ZABBIX_DIR/bin/{zabbix_server_ctrl,zabbix_agentd_ctrl}
 
-sed -i "/# DBHost=localhost/s/.*/DBHost=$ZABBIX_MYSQL_HOST/
-	/# DBPort=3306/s/.*/DBPort=$MYSQL_PORT/
-	/^DBUser=root/s/.*/DBUser=$ZABBIX_MYSQL_USER/
+sed -i "/# DBHost=localhost/s/.*/DBHost=$ZABBIX_MYSQL_HOST/;
+	/# DBPort=3306/s/.*/DBPort=$MYSQL_PORT/;
+	/^DBUser=root/s/.*/DBUser=$ZABBIX_MYSQL_USER/;
 	/# DBPassword=/s/.*/DBPassword=$ZABBIX_MYSQL_PASS/" $ZABBIX_DIR/etc/zabbix_server.conf
 
 $ZABBIX_DIR/bin/zabbix_server_ctrl start
