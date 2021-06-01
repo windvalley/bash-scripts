@@ -1,30 +1,28 @@
 #!/usr/bin/env bash
 # color_txt.sh
 
-
-color(){
+color() {
     local role=$1
     shift
     local str="$*"
 
     case $role in
-        success|ok)
-            color=[32m
-            ;;
-        failure|fail)
-            color=[31m
-            ;;
-        warning|warn)
-            color=[33m
-            ;;
-        *)
-            color=[39m  # default white color
-            ;;
+    success | ok)
+        color=[32m
+        ;;
+    failure | fail)
+        color=[31m
+        ;;
+    warning | warn)
+        color=[33m
+        ;;
+    *)
+        color=[39m # default white color
+        ;;
     esac
 
     echo -e "\033$color$str\033[m"
 }
-
 
 # e.g.
 echo -n "mysql started "

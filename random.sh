@@ -65,4 +65,4 @@ alphanumeric_rand(){
 
 digits_rand
 letters_rand 20
-alphanumeric_rand 30
+alphanumeric_rand 32
